@@ -11,6 +11,8 @@ smileCascade = cv2.CascadeClassifier("dataset/haarcascade_smile.xml")
 
 # Counter for saving images
 cnt = 500
+images_captured = 0  # Track number of images taken
+total_images = 3  # Capture 3 images
 save_path = r"D:\smile-selfie-capture-project\images"
 
 # Ensure save directory exists
@@ -19,7 +21,7 @@ os.makedirs(save_path, exist_ok=True)
 smile_start_time = None  # Track when the smile starts
 hold_duration = 3  # Time in seconds for holding the smile
 
-while True:
+while images_captured < total_images:
     success, img = video.read()
     if not success:
         print("Failed to capture video frame")
@@ -51,11 +53,17 @@ while True:
                 cv2.imwrite(img_path, img)
                 print(f"Image {cnt} saved at {img_path}")
 
-                # Pause for 2 seconds before exiting
-                time.sleep(2)
-                video.release()
-                cv2.destroyAllWindows()
-                exit()  # Stop the script after capturing the image
+                # Increment counters
+                cnt += 1
+                images_captured += 1
+
+                # Reset the timer to ensure next image also follows the 3-second smile condition
+                smile_start_time = None
+
+                # Wait before capturing the next image
+                if images_captured < total_images:
+                    print("Keep smiling! Next capture in 3 seconds...")
+                    time.sleep(3)  # Ensures smile is held again before the next capture
 
         else:
             smile_start_time = None  # Reset the timer if smile disappears
