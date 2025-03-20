@@ -1,6 +1,7 @@
 import cv2
 import os
 import time
+import random
 
 # Initialize video capture
 video = cv2.VideoCapture(0)
@@ -9,17 +10,21 @@ video = cv2.VideoCapture(0)
 faceCascade = cv2.CascadeClassifier("dataset/haarcascade_frontalface_default.xml")
 smileCascade = cv2.CascadeClassifier("dataset/haarcascade_smile.xml")
 
-# Counter for saving images
-cnt = 500
-images_captured = 0  # Track number of images taken
-total_images = 3  # Capture 3 images
-save_path = r"D:\smile-selfie-capture-project\images"
+# Generate a random 6-digit folder name
+folder_code = str(random.randint(100000, 999999))
+folder_path = os.path.join(r"D:\smile-selfie-capture-project\images", folder_code)
 
-# Ensure save directory exists
-os.makedirs(save_path, exist_ok=True)
+# Ensure the new folder exists
+os.makedirs(folder_path, exist_ok=True)
+
+# Track number of images taken
+images_captured = 0  
+total_images = 3  
 
 smile_start_time = None  # Track when the smile starts
 hold_duration = 3  # Time in seconds for holding the smile
+
+print(f"New session started. Images will be saved in: {folder_path}")
 
 while images_captured < total_images:
     success, img = video.read()
@@ -49,15 +54,14 @@ while images_captured < total_images:
 
             if elapsed_time >= hold_duration:
                 # Save the image after 3 seconds of continuous smiling
-                img_path = os.path.join(save_path, f"image_{cnt}.jpg")
+                img_path = os.path.join(folder_path, f"image_{images_captured+1}.jpg")
                 cv2.imwrite(img_path, img)
-                print(f"Image {cnt} saved at {img_path}")
+                print(f"Image {images_captured+1} saved at {img_path}")
 
-                # Increment counters
-                cnt += 1
+                # Increment counter
                 images_captured += 1
 
-                # Reset the timer to ensure next image also follows the 3-second smile condition
+                # Reset the timer for next image
                 smile_start_time = None
 
                 # Wait before capturing the next image
